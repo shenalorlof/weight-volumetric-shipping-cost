@@ -1,0 +1,30 @@
+add_filter('wcfmmp_shipping_weight_calculate_amount', function($amount, $price, $products, $destination_country, $destination_state, $weight_array_for_country, $default_cost_for_country, $total_weight, $weight_mode_for_country, $unit_cost_for_country) {
+	$cost = 0;
+	$total_length = 0;
+	$total_width = 0;
+	$total_height = 0;
+	$total_volume = 0;
+	
+	foreach ( $products as $product ) {
+		$qty = $product['quantity'];
+		$product = $product['data'];
+		$length = $product->get_length();
+        $width  = $product->get_width();
+        $height = $product->get_height();
+		
+		$total_length += ( $length * $qty );
+		$total_width += ( $width * $qty );
+		$total_height += ( $height * $qty );
+		$total_volume += ($total_length * $total_width * $total_height) /5000;
+	}
+	if($total_weight>$total_volume) {
+		if($total_weight>1) {
+			$cost += (($total_weight-1)*65)+250;
+		} else{
+			$cost += 250;
+		}
+	} else{ 
+		$cost += ($total_volume * 65);
+	}
+	return $cost;
+}, 10, 10);
